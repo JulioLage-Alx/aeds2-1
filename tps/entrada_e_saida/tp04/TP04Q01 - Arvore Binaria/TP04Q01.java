@@ -9,223 +9,79 @@ import java.util.List;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class TP04Q02 {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        String caminhoArquivo = "/tmp/pokemon.csv";
-        List<Pokemo> pokemos = Pokemo.ler(caminhoArquivo);
-        Arvore arvore = new Arvore();
-        Lista seguencia = new Lista();
 
-        int[] vetor = { 7, 3, 11, 1, 5, 9, 13, 0, 2, 4, 6, 8, 10, 12, 14 };
-        for (int i = 0; i < vetor.length; i++) {
-            arvore.inserir(vetor[i]);
-        }
+class Arvore{
+    No raiz;
+    Arvore(){raiz = null;}
 
-        String input;
-        while (!(input = scanner.nextLine()).equals("FIM")) {
-            int po = Integer.parseInt(input);
-            for (Pokemo produto : pokemos) {
-                if (produto.getid() == po) {
-                    seguencia.inserirFim(produto);
-                }
-            }
+    void inserir(Pokemo x){
+        raiz = inserir(x,raiz);
+    }
+    No inserir(Pokemo x, No i){
+        if(i==null){
+            i =new No(x);
+        }
+        else{
+        int resultado = x.getnome().compareTo(i.elemento.getnome());
+
+         if(resultado < 0){
+            i.esq =inserir(x, i.esq);
+
+        }
+        else if(resultado > 0 ){
+            i.dir =inserir(x, i.dir);
+
+        }
+        if (resultado == 0) {
+        }
+    }
+        return i;
+    }
+
+    boolean consutar(String nome){
+        System.out.print("=>raiz ");
+        return consutar(nome,raiz);
+
+    }
+    boolean consutar(String nome,No i){
+        boolean resp = false;
+        if (i==null) {
+            resp = false;
+        }
+        else {
+        int resultado = nome.compareTo(i.elemento.getnome());
+         if(resultado== 0){
+            resp =true;
+        }
+        else if(resultado < 0){
+            System.out.print("esq ");
+            resp = consutar(nome,i.esq);
         }
         
-    
-        for (int i = 0; i < seguencia.N; i++) {
-            arvore.inserirpokemon(seguencia.list[i]);
-        }
-        
-        
-        while (!(input = scanner.nextLine()).equals("FIM")) {
-            System.out.println("=> " + input);
-            Pokemo poke = null;
-        
-            for (Pokemo produto : pokemos) {
-                if (produto.getnome().equals(input)) {  
-                    poke = produto;
-                    break;  
-                }
-            }
-        
-            if (poke != null) {
-                String resultado = arvore.Pesquisarduas(poke) ? "SIM" : "NAO";
-                System.out.println(resultado);
-            } else {
-                System.out.println("Pokémon não encontrado.");
-            }
+        else {
+            System.out.print("dir ");
+            resp = consutar(nome,i.dir);
             
         }
         
-
-        scanner.close();
-    }
-}
-
-class No {
-    No esq, dir;
-    int elemento;
-    Arvoredois subarvore;
-
-    No(int elemento) {
-        this(elemento, null, null, new Arvoredois());
+        }
+        return resp;
     }
 
-    No(int element, No di, No es, Arvoredois arv) {
-        this.elemento = element;
-        this.dir = di;
-        this.esq = es;
-        this.subarvore = arv;
-    }
 
 }
 
-class NoSub {
-    NoSub esq, dir;
+class No{
+    No esq,dir;
     Pokemo elemento;
 
-    NoSub(Pokemo elemento) {
-        this(elemento, null, null);
+    No(Pokemo elemento){
+        this(elemento,null,null);
     }
-
-    NoSub(Pokemo element, NoSub di, NoSub es) {
+    No(Pokemo element,No di, No es){
         this.elemento = element;
-        this.dir = di;
+        this.dir =di;
         this.esq = es;
-
-    }
-}
-
-class Arvore {
-    No raiz;
-
-    Arvore() {
-        raiz = null;
-    }
-
-    void inserir(int x) {
-        raiz = inserir(x, raiz);
-    }
-
-    No inserir(int x, No i) {
-        if (i == null) {
-            i = new No(x);
-        } else if (x < i.elemento) {
-            i.esq = inserir(x, i.esq);
-        } else if (x > i.elemento) {
-            i.dir = inserir(x, i.dir);
-        }
-        return i;
-    }
-
-    No achano(int nome) {
-       
-        No resultado = achano(nome, raiz);
-        return resultado;
-    }
-    
-    No achano(int nome, No i) {
-        if (i == null) {
-            return null;
-        }
-    
-        if (nome == i.elemento) {
-
-            return i;
-        }
-    
-        if (nome < i.elemento) {
-            return achano(nome, i.esq);
-        } else {
-            return achano(nome, i.dir);
-        }
-    }
-    
-    boolean Pesquisarduas(Pokemo nome) {
-        System.out.print("raiz ");
-        boolean resultado = Pesquisarduas(nome, raiz);
-        return resultado;
-    }
-    
-    boolean Pesquisarduas(Pokemo nome, No i) {
-        int capture = nome.getcapture() % 15;
-        if (i == null) {
-            return false;
-        }
-    
-        if (capture == i.elemento) {
-            return true;
-        }
-    
-        if (capture < i.elemento) {
-        System.out.print("ESQ ");
-
-            i.subarvore.consultar(nome.getnome());
-            return Pesquisarduas(nome, i.esq);
-        } else {
-        System.out.print("DIR ");
-
-            i.subarvore.consultar(nome.getnome());
-            return Pesquisarduas(nome, i.dir);
-        }
-    }
-    
-
-    void inserirpokemon(Pokemo nome) {
-        int capture = nome.getcapture() % 15;
-        No insere = achano(capture);
-        if (insere != null) {
-            insere.subarvore.inserir(nome);
-        } else {
-            System.out.println("Nó não encontrado.");
-        }
-    }
-
-    
-}
-
-class Arvoredois {
-    NoSub raiz;
-
-    Arvoredois() {
-        raiz = null;
-    }
-
-    void inserir(Pokemo x) {
-        raiz = inserir(x, raiz);
-    }
-
-    NoSub inserir(Pokemo x, NoSub i) {
-        if (i == null) {
-            i = new NoSub(x);
-        } else {
-            int resultado = x.getnome().compareTo(i.elemento.getnome());
-            if (resultado < 0) {
-                i.esq = inserir(x, i.esq);
-            } else if (resultado > 0) {
-                i.dir = inserir(x, i.dir);
-            }
-        }
-        return i;
-    }
-
-    boolean consultar(String nome) {
-        return consultar(nome, raiz);
-    }
-
-    boolean consultar(String nome, NoSub i) {
-        if (i == null)
-            return false;
-        int resultado = nome.compareTo(i.elemento.getnome());
-        if (resultado == 0)
-            return true;
-        if (resultado < 0) {
-            System.out.print("esq ");
-            return consultar(nome, i.esq);
-        }
-        System.out.print("dir ");
-        return consultar(nome, i.dir);
     }
 }
 
@@ -307,13 +163,48 @@ class Matriz {
     }
 }
 
+public class TP04Q01 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String caminhoArquivo = "/tmp/pokemon.csv";
+        List<Pokemo> pokemos = Pokemo.ler(caminhoArquivo); // Chama o método estático diretamente
+        Arvore arvore =new Arvore();
+        Lista seguencia = new Lista();
+
+        String input;
+        while (!(input = scanner.nextLine()).equals("FIM")) {
+            int po = Integer.parseInt(input);
+            for (Pokemo produto : pokemos) {
+                if (produto.getid() == po) {
+                    seguencia.inserirFim(produto);
+
+                }
+            }
+        }
+        for(int i=0;i<seguencia.N;i++){
+            arvore.inserir(seguencia.list[i]);
+        }
+        while (!(input = scanner.nextLine()).equals("FIM")) {
+            System.out.println(input);
+            String resultado = arvore.consutar(input) ? "SIM" : "NAO";
+            System.out.println(resultado); 
+            
+        }
+
+
+    
+
+       
+    }
+}
+
 class Lista {
     public Pokemo[] list;
-    public int N;
+    public int N; 
 
     public Lista() {
-        list = new Pokemo[802];
-        this.N = 0;
+        list = new Pokemo[802]; 
+        this.N = 0; 
     }
 
     public void inserirFim(Pokemo pokemon) {
@@ -399,7 +290,7 @@ class Lista {
             System.out.println(list[i].getnome());
         }
     }
-
+    
 }
 
 class Pokemo {
@@ -670,9 +561,10 @@ class Pokemo {
     }
 
     public static void imprimirsequencia(Lista pokemos) {
-        for (int i = 0; i < pokemos.N; i++) {
-            System.out.println("[" + i + "] " + pokemos.list[i].toString());
+        for(int i =0;i<pokemos.N;i++){
+            System.out.println("["+i+"] "+pokemos.list[i].toString());
         }
+
 
     }
 
@@ -706,26 +598,26 @@ class Pokemo {
     }
 
     // private String arrayToString(String[] list) {
-    // StringBuilder sb = new StringBuilder();
-    // sb.append("[");
-    // for (int i = 0; i < list.length; i++) {
-    // if (list[i] != "") {
-    // sb.append("'");
-    // sb.append(list[i]);
-    // // sb.append("'");
-    // }
-    // if (i + 1 < list.length && list[i + 1] != "")
-    // sb.append(", ");
-    // }
-    // sb.append("]");
-    // return sb.toString();
+    //     StringBuilder sb = new StringBuilder();
+    //     sb.append("[");
+    //     for (int i = 0; i < list.length; i++) {
+    //         if (list[i] != "") {
+    //             sb.append("'");
+    //             sb.append(list[i]);
+    //             // sb.append("'");
+    //         }
+    //         if (i + 1 < list.length && list[i + 1] != "")
+    //             sb.append(", ");
+    //     }
+    //     sb.append("]");
+    //     return sb.toString();
     // }
 
     private String arrayToString(String[] list) {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         boolean firstElement = true; // Para controlar a primeira inserção
-
+    
         for (String item : list) {
             if (!item.isEmpty()) { // Verifica se a string não está vazia
                 if (!firstElement) {
@@ -735,16 +627,15 @@ class Pokemo {
                 firstElement = false; // Marca que o primeiro elemento foi adicionado
             }
         }
-
+    
         sb.append("]");
         return sb.toString();
     }
-
     private String arrayToStringH(String[] list) {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         boolean firstElement = true; // Para controlar a primeira inserção
-
+    
         for (String item : list) {
             if (!item.isEmpty()) { // Verifica se a string não está vazia
                 if (!firstElement) {
@@ -754,9 +645,9 @@ class Pokemo {
                 firstElement = false; // Marca que o primeiro elemento foi adicionado
             }
         }
-
+    
         sb.append("]");
         return sb.toString();
     }
-
+    
 }
